@@ -1,0 +1,42 @@
+name: Release Obsidian Plugin
+
+# This tells GitHub to only run this script when you push a new "tag" (like a version number)
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # This gives GitHub permission to create the release page
+
+    steps:
+      # Step A: Download your code onto the GitHub server
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step B: Install Node.js (the environment needed to run the build tools)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Step C: Read package.json and install esbuild and typescript
+      - name: Install dependencies
+        run: npm install
+
+      # Step D: Run the build script to create main.js
+      - name: Build plugin
+        run: npm run build
+
+      # Step E: Take the 3 required Obsidian files and publish them to the Releases page
+      - name: Release Plugin
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            main.js
+            manifest.json
+            styles.css
+          generate_release_notes: true
