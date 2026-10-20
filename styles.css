@@ -1,5 +1,5 @@
 /*
- * Gallery plugin styles.
+ * Gallery plugin styles. 
  *
  * Everything uses Obsidian's CSS variables, so it follows the user's theme.
  * Tunable via a CSS snippet:  .obs-gallery-wrapper { --obs-gallery-gap: 8px; }
