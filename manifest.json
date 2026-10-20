@@ -1,7 +1,7 @@
 {
     "id": "obs-gallery",
     "name": "Image Gallery",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "minAppVersion": "1.4.0",
     "description": "Show specific images or folders of images as a masonry grid or carousel.",
     "author": "Your Name",
