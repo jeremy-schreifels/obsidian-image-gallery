@@ -1,0 +1,246 @@
+/*
+ * Gallery plugin styles.
+ *
+ * Everything uses Obsidian's CSS variables, so it follows the user's theme.
+ * Tunable via a CSS snippet:  .obs-gallery-wrapper { --obs-gallery-gap: 8px; }
+ *
+ * NOTE on selectors like `.obs-gallery-carousel button.obs-gallery-nav`:
+ * Obsidian styles every <button> with `button:not(.clickable-icon)`. Our
+ * selectors need slightly higher specificity to override it reliably.
+ */
+
+.obs-gallery-wrapper {
+    --obs-gallery-gap: 16px;           /* also read by MasonryView via getComputedStyle */
+    --obs-gallery-caption-lines: 2;    /* set from plugin settings */
+    margin: 1.5em 0;
+    width: 100%;
+}
+
+/* ---------- Messages ---------- */
+
+.obs-gallery-error,
+.obs-gallery-empty {
+    padding: var(--size-4-4);
+    border-radius: var(--radius-m);
+    text-align: center;
+}
+
+.obs-gallery-error {
+    background: var(--background-modifier-error);
+    color: var(--text-on-accent);
+}
+
+.obs-gallery-empty {
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    color: var(--text-muted);
+}
+
+.obs-gallery-warnings {
+    margin-bottom: var(--size-4-2);
+    color: var(--text-warning);
+    font-size: var(--font-ui-smaller);
+}
+
+.obs-gallery-broken {
+    padding: var(--size-4-4);
+    color: var(--text-faint);
+    font-size: var(--font-ui-smaller);
+    text-align: center;
+}
+
+/* ---------- Captions (shared) ---------- */
+
+.obs-gallery-caption {
+    width: 100%;
+    padding: var(--size-4-2);
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+    text-align: center;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    /* Multi-line truncation; the line count comes from a variable. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--obs-gallery-caption-lines);
+    line-clamp: var(--obs-gallery-caption-lines);
+}
+
+/* ---------- Masonry ---------- */
+
+/*
+ * Grid with tiny rows. MasonryView sets --obs-gallery-span on each item so it
+ * covers exactly as many rows as its height needs.
+ */
+.obs-gallery-masonry {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-auto-rows: 10px;
+    gap: var(--obs-gallery-gap);
+    align-items: start;
+}
+
+.obs-gallery-masonry-item {
+    grid-row-end: span var(--obs-gallery-span, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    background: var(--background-primary);
+    box-shadow: var(--shadow-s);
+}
+
+.obs-gallery-masonry-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* A failed image keeps the same 4:3 footprint as a loading one, so tiles look consistent. */
+.obs-gallery-masonry-item .obs-gallery-broken {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+}
+
+/* Placeholder box while a lazy image has not loaded yet. */
+.obs-gallery-masonry-item img.is-loading {
+    aspect-ratio: 4 / 3;
+    background: var(--background-secondary);
+}
+
+/* ---------- Carousel ---------- */
+
+.obs-gallery-carousel {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    background: var(--background-secondary);
+}
+
+.obs-gallery-carousel:focus-visible {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: -2px;
+}
+
+/* A fixed aspect ratio stops the layout jumping between portrait/landscape images. */
+.obs-gallery-carousel-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 70vh;
+    touch-action: pan-y; /* vertical scroll stays native; horizontal swipes are ours */
+}
+
+.obs-gallery-carousel-slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.obs-gallery-carousel-slide.is-active {
+    display: flex;
+    animation: obs-gallery-fade 0.3s ease-in-out;
+}
+
+.obs-gallery-carousel-slide img {
+    flex: 1 1 0;
+    min-height: 0; /* lets the image shrink instead of overflowing the stage */
+    width: 100%;
+    object-fit: contain;
+}
+
+.obs-gallery-carousel .obs-gallery-caption {
+    flex: none;
+}
+
+@keyframes obs-gallery-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.obs-gallery-carousel button.obs-gallery-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--background-modifier-cover);
+    color: var(--text-normal);
+    box-shadow: var(--shadow-s);
+    cursor: pointer;
+}
+
+.obs-gallery-carousel button.obs-gallery-nav:hover {
+    background: var(--background-modifier-hover);
+}
+
+.obs-gallery-nav.prev { left: var(--size-4-2); }
+.obs-gallery-nav.next { right: var(--size-4-2); }
+
+.obs-gallery-carousel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4-2);
+    min-height: 28px;
+    padding: var(--size-4-2);
+}
+
+.obs-gallery-carousel button.obs-gallery-dot {
+    width: 10px;
+    height: 10px;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--background-modifier-border-hover);
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.obs-gallery-carousel button.obs-gallery-dot.is-active {
+    background: var(--interactive-accent);
+}
+
+.obs-gallery-counter {
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+}
+
+/* ---------- Pagination ---------- */
+
+.obs-gallery-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4-4);
+    margin-top: var(--size-4-4);
+}
+
+/* aria-disabled (not `disabled`) keeps keyboard focus on the button at the ends. */
+.obs-gallery-pagination button[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ---------- Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .obs-gallery-carousel-slide.is-active {
+        animation: none;
+    }
+}
